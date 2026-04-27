@@ -14,16 +14,16 @@ class _HomeViewState extends State<HomeView> {
   String resultado = "";
 
   void convertir() async {
-    if (inputController.text.isEmpty) {
+    double? valor = double.tryParse(inputController.text);
+
+    if (valor == null) {
       setState(() {
-        resultado = "Ingrese un valor";
+        resultado = "Ingrese un número válido";
       });
       return;
     }
 
-    double celsius = double.parse(inputController.text);
-
-    Temperatura? temp = await api.convertir(celsius);
+    Temperatura? temp = await api.convertir(valor);
 
     if (temp != null) {
       setState(() {
@@ -41,31 +41,53 @@ class _HomeViewState extends State<HomeView> {
     return Scaffold(
       appBar: AppBar(
         title: Text("Predicción Celsius → Fahrenheit"),
+        backgroundColor: Colors.deepPurple,
       ),
-      body: Padding(
-        padding: EdgeInsets.all(20),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            TextField(
-              controller: inputController,
-              keyboardType: TextInputType.number,
-              decoration: InputDecoration(
-                labelText: "Ingrese valor en Celsius",
-                border: OutlineInputBorder(),
+      body: Center(
+        child: Padding(
+          padding: EdgeInsets.all(20),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              TextField(
+                controller: inputController,
+                keyboardType: TextInputType.number,
+                decoration: InputDecoration(
+                  labelText: "Celsius",
+                  hintText: "Ej: 25",
+                  border: OutlineInputBorder(),
+                ),
               ),
-            ),
-            SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: convertir,
-              child: Text("Predict"),
-            ),
-            SizedBox(height: 20),
-            Text(
-              "Resultado: $resultado",
-              style: TextStyle(fontSize: 22, color: Colors.red),
-            ),
-          ],
+
+              SizedBox(height: 20),
+
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.deepPurple,
+                  padding:
+                      EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+                ),
+                onPressed: convertir,
+                child: Text(
+                  "Convertir",
+                  style: TextStyle(fontSize: 16, color: Colors.white),
+                ),
+              ),
+
+              SizedBox(height: 20),
+
+              Text(
+                resultado.isEmpty ? "" : "Resultado: $resultado",
+                style: TextStyle(
+                  fontSize: 22,
+                  color: resultado.contains("Error") ||
+                          resultado.contains("Ingrese")
+                      ? Colors.red
+                      : Colors.green,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
